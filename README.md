@@ -542,3 +542,99 @@ fn calculate_length(s: String) -> (String, usize) {
 }
 
 ```
+
+### references and borrowing
+
+```
+cargo new references_borrowing
+```
+
+``` rust
+fn main() {
+    let mut s = String::from("hello world");
+
+    let str_length = calculate_length(&s);
+
+    println!("The length of '{}' is {}.", s, str_length);
+
+    change(&mut s);
+    change(&mut s);
+
+    // 同一时间只能有一个可变引用
+    // 同一时间也不能同时出现多个不可变引用及可变引用
+    // let s1 = &mut s;
+    // let s2 = &mut s;
+    // println!("s1: {}, s2: {}", s1, s2);
+
+    println!("changed s: {}", s);
+}
+
+// 引用不会拿去所有权 （don't taking ownership of the value）
+// 引用使用操作符 &
+// Note: The opposite of referencing by using & is dereferencing, which is accomplished with the dereference operator, *
+fn calculate_length(s: &String) -> usize {
+    // s.push_str("test");  // 引用的是一个不可变的变量，所以不能改变它的值
+    s.len()
+}
+
+fn change(s: &mut String) {
+    s.push_str(" test ");
+}
+
+// Dangling References
+// fn dangle() -> &String { // dangle returns a reference to a String
+
+//     let s = String::from("hello"); // s is a new String
+
+//     &s // we return a reference to the String, s
+// } // Here, s goes out of scope, and is dropped. Its memory goes away.
+//   // Danger!
+
+```
+
+### slice 切片
+
+> Slices let you reference a contiguous sequence of elements in a collection rather than the whole collection. A slice is a kind of reference, so it does not have ownership.
+
+slice 是一种引用，因此它没有所有权
+
+``` sh
+cargo new slice
+```
+
+``` rust
+fn main() {
+    let s = String::from("hello world");
+    let hello = &s[0..5];
+    let world = &s[6..11];
+
+    println!("{} {}", hello, world);
+
+    let first_world = first_word(&s);
+    println!("{}", first_world);
+
+    // s.clear();  // error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
+    // 可变引用和不可变引用不能在同一时间内出现
+
+    println!("{}", first_world);
+
+    let a = [1, 2, 3, 4, 5];
+    let slice = &a[1..3];
+
+    assert_eq!(slice, &[2, 3]);
+}
+
+
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
+}
+
+```
