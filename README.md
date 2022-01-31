@@ -817,3 +817,9 @@ fn remove_fancy_hat() {}
 fn move_player(num_spaces: u8) {}
 
 ```
+
+## packages 、crates 、modules
+
+``` sh
+cargo new --lib restaurant
+```
